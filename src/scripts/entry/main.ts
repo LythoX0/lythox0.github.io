@@ -1,0 +1,9 @@
+import "../components/lib/ColorSchemeSwitcher.svelte";
+import "../components/lib/MediaViewModal.svelte";
+import "../alpine";
+import "../color-scheme";
+import "../overlayscrollbars";
+import "../scroll-to-top";
+import "../../styles/animate.css";
+import "../../styles/main.scss";
+import "../../styles/tailwind.css";

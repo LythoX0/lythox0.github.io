@@ -1,0 +1,67 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import PostCard from "../components/PostCard.astro";
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("posts", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const pageSize = 10;
+const currentPage = 1;
+const totalPages = Math.ceil(posts.length / pageSize);
+const paginatedPosts = posts.slice(0, pageSize);
+---
+
+<Layout title="首页">
+  <div class="main flex flex-col px-4 lg:flex-row">
+    <Sidebar />
+    <div
+      class="content-wrapper pt-32 lg:w-3/4 lg:p-8"
+      :class="{ 'is-second': menuVisible }"
+    >
+      <h2 class="mb-8 inline-flex items-center gap-2 text-lg text-base-content/90">
+        <i class="i-ri-article-line inline-block"></i>
+        最新文章
+      </h2>
+      {
+        paginatedPosts.map((post, i) => (
+          <PostCard post={post} index={i} />
+        ))
+      }
+      {
+        totalPages > 1 && (
+          <div class="index-page">
+            <div class="animated fadeIn flex justify-between font-bold">
+              {
+                currentPage > 1 && (
+                  <a
+                    href={`/page/${currentPage - 1}`}
+                    class="inline-flex items-center gap-1 border-b-2 border-b-transparent text-sm text-base-content/90 hover:border-base-content hover:text-base-content"
+                  >
+                    <i class="i-ri-arrow-left-line inline-block"></i>
+                    上一页
+                  </a>
+                )
+              }
+              {
+                currentPage < totalPages && (
+                  <a
+                    href={`/page/${currentPage + 1}`}
+                    class="inline-flex items-center gap-1 border-b-2 border-b-transparent text-sm text-base-content/90 hover:border-base-content hover:text-base-content"
+                  >
+                    下一页
+                    <i class="i-ri-arrow-right-line inline-block"></i>
+                  </a>
+                )
+              }
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Layout>

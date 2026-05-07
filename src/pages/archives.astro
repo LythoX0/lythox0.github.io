@@ -1,0 +1,109 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("posts");
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// 按年份分组
+const yearGroups = new Map<string, typeof posts>();
+for (const post of posts) {
+  const year = post.data.date.getFullYear().toString();
+  if (!yearGroups.has(year)) {
+    yearGroups.set(year, []);
+  }
+  yearGroups.get(year)!.push(post);
+}
+
+const sortedYears = Array.from(yearGroups.entries()).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+const allYears = sortedYears.map(([year]) => year);
+
+// 为每篇文章添加年份数据用于前端筛选
+const postsWithYear = posts.map((post) => ({
+  ...post,
+  data: {
+    ...post.data,
+    slug: post.slug,
+    year: post.data.date.getFullYear().toString(),
+    monthDay: post.data.date.toISOString().split("T")[0].slice(5),
+  },
+}));
+---
+
+<Layout title="归档">
+  <div class="main flex flex-col px-4 lg:flex-row">
+    <Sidebar />
+    <div
+      class="content-wrapper pt-32 lg:w-3/4 lg:p-8"
+      x-data={`{ 
+        activeYear: '',
+        posts: ${JSON.stringify(postsWithYear)},
+        years: ${JSON.stringify(allYears)},
+        get filteredPosts() {
+          if (this.activeYear) {
+            return this.posts.filter(p => p.data.year === this.activeYear);
+          }
+          return this.posts;
+        },
+        get groupedPosts() {
+          const groups = {};
+          for (const post of this.filteredPosts) {
+            const year = post.data.year;
+            if (!groups[year]) {
+              groups[year] = [];
+            }
+            groups[year].push(post);
+          }
+          return Object.entries(groups).sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+        }
+      }`}
+      :class="{ 'is-second': menuVisible }"
+    >
+      <h2 class="mb-4 inline-flex items-center gap-2 text-lg text-base-content/90">
+        <i class="i-ri-archive-line inline-block"></i>
+        归档
+      </h2>
+      
+      <!-- 年份筛选按钮 -->
+      <div class="mb-8 flex flex-wrap gap-2">
+        <button
+          @click="activeYear = ''"
+          :class="activeYear === '' ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content hover:bg-base-300'"
+          class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+        >
+          全部
+        </button>
+        <template x-for="year in years" :key="year">
+          <button
+            @click="activeYear = year"
+            :class="activeYear === year ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content hover:bg-base-300'"
+            class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            x-text="year"
+          ></button>
+        </template>
+      </div>
+
+      <!-- 文章列表 -->
+      <div class="space-y-8">
+        <template x-for="([year, yearPosts]) in groupedPosts" :key="year">
+          <div class="year-group">
+            <h3 class="mb-4 text-2xl font-bold text-base-content/90" x-text="year"></h3>
+            <div class="space-y-4">
+              <template x-for="post in yearPosts" :key="post.data.slug">
+                <a
+                  :href="'/posts/' + post.data.slug"
+                  class="group flex items-center gap-4 rounded-lg p-3 transition-colors hover:bg-base-200"
+                >
+                  <span class="whitespace-nowrap text-sm text-base-content/50" x-text="post.data.monthDay"></span>
+                  <span class="text-base font-medium text-base-content/80 group-hover:text-base-content" x-text="post.data.title"></span>
+                  <span class="ml-auto hidden text-sm text-base-content/40 sm:block" x-text="post.data.categories[0] || ''" x-show="post.data.categories.length > 0"></span>
+                </a>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</Layout>

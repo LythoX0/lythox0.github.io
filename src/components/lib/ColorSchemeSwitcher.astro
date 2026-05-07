@@ -1,0 +1,10 @@
+---
+interface Props {
+  type?: "switch" | "icon";
+  class?: string;
+}
+
+const { type = "switch", class: className = "" } = Astro.props;
+---
+
+<div data-color-scheme-switcher={type} class={className}></div>

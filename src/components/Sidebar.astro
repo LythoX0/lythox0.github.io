@@ -1,0 +1,87 @@
+---
+import ColorSchemeSwitcher from "./lib/ColorSchemeSwitcher.astro";
+import { SITE_CONFIG } from "../config";
+
+interface Props {
+  showToc?: boolean;
+  tocSelector?: string;
+}
+
+const config = SITE_CONFIG;
+const { showToc } = Astro.props;
+const pathname = Astro.url.pathname;
+
+const menuItems = config.menu;
+---
+
+<div id="sidebar" class="sidebar-wrapper lg:static lg:w-1/4">
+  <div class="top-0 lg:sticky">
+    <div class="sidebar-content">
+      <div class="static left-0 right-0 top-0 z-50 hidden items-center p-4 px-0 lg:block">
+        <div class="flex items-center justify-between">
+          <div
+            class="inline-flex items-center gap-4 justify-between !flex w-full"
+          >
+            {
+              config.styles.color_scheme.enable_change && (
+                <ColorSchemeSwitcher
+                  type={config.styles.color_scheme.switcher_type || "switch"}
+                  class="mt-4 inline-flex [&>*>i]:text-2xl"
+                />
+              )
+            }
+          </div>
+        </div>
+        <div class="group relative mt-32 inline-block">
+          <a href="/">
+            <img
+              class="animated fadeIn avatar mx-0 size-24 rounded-full"
+              src={config.logo}
+              alt={config.title}
+              width="96"
+              height="96"
+            />
+          </a>
+        </div>
+        <h1 class="animated fadeIn mt-8 text-4xl font-extrabold" style="animation-delay: 0.1s">
+          {config.sidebar.title || config.title}
+        </h1>
+      </div>
+      {
+        !showToc && (
+          <div class="animated fadeIn" style="animation-delay: 0.2s">
+            <p class="my-4 hidden font-light text-base-content/80 lg:block">
+              {config.sidebar.description || config.subtitle}
+            </p>
+            <div class="animated fadeIn mt-6 hidden lg:block" style="animation-delay: 0.4s">
+              <ul x-data="menu" id="menu-container" class="w-full space-y-6">
+                {
+                  menuItems.map((item) => (
+                    <li>
+                      <a
+                        href={item.href}
+                        class={`flex items-center space-x-2.5 text-base-content/70 hover:text-base-content ${pathname === item.href ? "!text-base-content" : ""}`}
+                      >
+                        <span>{item.name}</span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </div>
+        )
+      }
+      {
+        showToc && (
+          <div class="animated fadeIn" style="animation-delay: 0.4s">
+            <p class="my-4 hidden font-light text-base-content/80 lg:block">文章目录</p>
+            <div class="toc-container hidden lg:block"></div>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</div>
+
+

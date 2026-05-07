@@ -1,0 +1,111 @@
+.moment-content {
+  .tag {
+    &::before {
+      content: "#";
+    }
+    @apply inline-flex items-center gap-x-1.5 rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary/80 hover:no-underline;
+  }
+}
+
+.moment-media {
+  display: table;
+
+  & > div {
+    overflow: hidden;
+    float: left;
+  }
+
+  & img,
+  & video {
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  &.medium-1 {
+    & .moment-media-item {
+      width: 100%;
+    }
+  }
+
+  &.medium-2,
+  &.medium-4 {
+    & .moment-media-item {
+      width: 48%;
+      margin: 1%;
+    }
+  }
+
+  &.medium-3 {
+    & .moment-media-item {
+      width: 31.33%;
+      margin: 1%;
+
+      &:nth-child(1) {
+        width: 64.67%;
+      }
+    }
+  }
+
+  &.medium-5,
+  &.medium-8 {
+    & .moment-media-item {
+      width: 31.33%;
+      margin: 1%;
+
+      &:nth-child(n + 1):nth-child(-n + 2) {
+        width: 48%;
+        margin: 1%;
+      }
+    }
+  }
+
+  &.medium-6 {
+    & .moment-media-item {
+      width: 31.33%;
+      margin: 1.1% 1%;
+
+      &:nth-child(1) {
+        width: 64.67%;
+      }
+    }
+  }
+
+  &.medium-7 {
+    & .moment-media-item {
+      width: 31.33%;
+      margin: 1%;
+
+      &:nth-child(n + 4):nth-child(-n + 7) {
+        width: 23%;
+      }
+    }
+  }
+
+  &.medium-9 {
+    & .moment-media-item {
+      width: 31.33%;
+      margin: 1%;
+    }
+  }
+}
+
+.moment-upvote-button {
+  @apply inline-flex;
+  button {
+    @apply inline-flex text-sm text-base-content/50 transition-all hover:text-red-700;
+
+    div {
+      @apply inline-flex size-6 items-center justify-center rounded-full;
+    }
+
+    &[data-upvoted="true"] {
+      @apply text-red-700;
+    }
+  }
+
+  &:hover {
+    div {
+      @apply bg-base-200;
+    }
+  }
+}

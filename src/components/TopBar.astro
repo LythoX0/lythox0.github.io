@@ -1,0 +1,30 @@
+---
+import ColorSchemeSwitcher from "./lib/ColorSchemeSwitcher.astro";
+import { SITE_CONFIG } from "../config";
+const config = SITE_CONFIG;
+---
+
+<div class="fixed left-0 right-0 top-0 z-50 flex items-center bg-base-100 p-4 shadow-sm lg:hidden">
+  <a href={config.url}>
+    <img
+      class="animated fadeIn avatar mx-4 mt-0 size-9 rounded-full"
+      src={config.logo}
+      alt={config.title}
+      width="36"
+      height="36"
+    />
+  </a>
+  <h1 class="animated fadeIn mt-0 text-xl font-extrabold" style="animation-delay: 0.1s">
+    {config.sidebar.title || config.title}
+  </h1>
+  <div class="flex flex-1 items-center justify-end gap-4">
+    {
+      config.styles.color_scheme.enable_change && (
+        <ColorSchemeSwitcher
+          type={config.styles.color_scheme.switcher_type || "switch"}
+          class="inline-flex [&>*>i]:text-xl"
+        />
+      )
+    }
+  </div>
+</div>

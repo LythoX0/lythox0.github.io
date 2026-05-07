@@ -1,0 +1,58 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+---
+
+<Layout title="关于">
+  <div id="app" class="main flex flex-col px-4 lg:flex-row">
+    <Sidebar />
+    <div
+      class="content-wrapper post-detail animated fadeIn pt-32 lg:w-3/4 lg:p-8"
+      :class="{ 'is-second': menuVisible }"
+    >
+      <h1 class="break-all text-3xl font-bold">关于</h1>
+
+      <div class="my-8 flex flex-col items-center gap-4 lg:flex-row lg:gap-8">
+        <img
+          class="size-32 rounded-full object-cover shadow-md lg:size-40"
+          src="/assets/avatar.jpg"
+          alt="头像"
+          width="160"
+          height="160"
+        />
+        <div>
+          <h2 class="text-2xl font-bold">LythoX</h2>
+          <p class="mt-2 text-base-content/70">
+            保持微笑
+          </p>
+        </div>
+      </div>
+
+      <hr class="my-8 border-base-content/10" />
+
+      <div class="tailwind-typography markdown-body overflow-hidden">
+        <h2>关于本站</h2>
+        <p>
+          这是一个基于 <strong>Astro</strong> 搭建的个人博客，使用了 <strong>Walker</strong> 主题的设计风格。
+          Walker 是一款漂亮、简洁、优雅的博客主题，由 EryouHao 设计，最初为 Gridea 开发，后由 Halo 团队移植到 Halo 平台。
+        </p>
+
+        <h2>技术栈</h2>
+        <ul>
+          <li><strong>框架：</strong>Astro</li>
+          <li><strong>样式：</strong>Tailwind CSS + daisyUI</li>
+          <li><strong>交互：</strong>Alpine.js</li>
+          <li><strong>部署：</strong>GitHub Pages</li>
+        </ul>
+
+        <h2>联系我</h2>
+        <p>
+          <a href="https://github.com/LythoX0" target="_blank" class="inline-flex items-center gap-2 text-base-content/70 hover:text-base-content">
+            <i class="i-ri-github-line inline-block text-xl"></i>
+            GitHub
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

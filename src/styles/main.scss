@@ -1,0 +1,231 @@
+body {
+  font:
+    400 18px/1.42 "Droid Serif",
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Droid Sans Fallback",
+    "Microsoft YaHei",
+    sans-serif;
+  overflow: auto;
+}
+.main {
+  margin: 0 auto;
+}
+.post-item {
+  .feature-image-wrapper {
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.35s cubic-bezier(0.5, 0, 0.5, 1);
+    overflow: hidden;
+    &:hover {
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    }
+  }
+  .post-feature-image {
+    display: block;
+    transition: all 0.35s cubic-bezier(0.5, 0, 0.5, 1);
+  }
+  .post-title {
+    display: inline-block;
+    border-bottom: 2px solid transparent;
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.5, 0, 0.5, 1);
+    &:after {
+      @apply bg-base-content;
+      content: "";
+      width: 0;
+      height: 2px;
+      position: absolute;
+      left: 0;
+      bottom: -8px;
+      transition: width 0.35s cubic-bezier(0.5, 0, 0.5, 1);
+    }
+    &:hover {
+      &:after {
+        width: 100%;
+      }
+    }
+  }
+}
+.archives-container {
+  .post-title {
+    display: inline-block;
+    border-bottom: 2px solid transparent;
+    position: relative;
+    transition: all 0.35s cubic-bezier(0.5, 0, 0.5, 1);
+    &:after {
+      @apply bg-base-content/90;
+      content: "";
+      width: 0;
+      height: 2px;
+      position: absolute;
+      left: 0;
+      bottom: -8px;
+      transition: width 0.35s cubic-bezier(0.5, 0, 0.5, 1);
+    }
+    &:hover {
+      &:after {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.toc-container {
+  .toc-list-item > .toc-list {
+    @apply my-3 ml-3 space-y-1 border-l border-base-content/10 pl-2;
+  }
+
+  .is-active-link {
+    @apply rounded bg-base-200;
+  }
+}
+
+.menu-container {
+  @apply bg-base-100;
+  width: 320px;
+  position: fixed;
+  top: 0;
+  left: -320px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 50px;
+  transition: all 0.35s ease-in-out;
+  z-index: 1000;
+  justify-content: center;
+  overflow-y: auto;
+  .close-menu-btn {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+  }
+}
+.menu-container.open {
+  left: 0px;
+  box-shadow: 5px 0px 36px rgba(0, 0, 0, 0.1);
+}
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: all 0.35s;
+  opacity: 0;
+  z-index: -1;
+  @apply bg-[#0006] transition-opacity;
+}
+.mask.open {
+  display: block;
+  opacity: 1;
+  z-index: 100;
+}
+.content-wrapper {
+  transition: all 0.35s cubic-bezier(0.5, 0, 0.5, 1);
+}
+.content-wrapper.is-second {
+  @apply translate-x-8 translate-y-8;
+}
+.sidebar-content {
+  height: 100vh;
+  overflow-y: auto;
+}
+@media (min-width: 600px) {
+  .post-item {
+    .post-feature-image {
+      &:hover {
+        transform: rotate(5deg) scale(1.1);
+      }
+    }
+  }
+}
+@media (max-width: 1024px) {
+  .sidebar-content {
+    height: auto;
+  }
+}
+
+// View transition API
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 9999;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}
+
+[data-color-scheme="dark"]::view-transition-old(root) {
+  z-index: 1;
+}
+
+[data-color-scheme="dark"]::view-transition-new(root) {
+  z-index: 9999;
+}
+
+// Components
+.post-floating-bar-upvote-button {
+  @apply inline-flex h-full rounded-full px-2 text-base-content/70 hover:bg-base-200;
+
+  button {
+    @apply h-full justify-center gap-1.5;
+
+    &[data-upvoted="true"] {
+      @apply text-red-700;
+    }
+  }
+
+  span {
+    @apply text-sm;
+  }
+
+  &:hover {
+    div {
+      @apply text-red-600;
+    }
+  }
+}
+
+.post-detail-upvote-button,
+.page-detail-upvote-button {
+  @apply inline-flex text-base-content/50;
+
+  button {
+    @apply gap-1.5;
+
+    &[data-upvoted="true"] {
+      div {
+        @apply text-red-700;
+      }
+    }
+
+    span {
+      @apply text-sm font-light;
+    }
+  }
+}
+
+.post-list-upvote-button {
+  @apply inline-flex text-xs text-base-content/50;
+
+  button {
+    @apply gap-1;
+
+    &[data-upvoted="true"] {
+      div {
+        @apply text-red-700;
+      }
+    }
+
+    span {
+      @apply text-xs font-light;
+    }
+  }
+}

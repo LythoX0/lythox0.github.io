@@ -1,0 +1,167 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import PostCard from "../components/PostCard.astro";
+import { getCollection } from "astro:content";
+
+const posts = await getCollection("posts", ({ data }) => {
+  return import.meta.env.PROD ? !data.draft : true;
+});
+
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// 获取所有分类
+const categoryMap = new Map<string, number>();
+for (const post of posts) {
+  for (const cat of post.data.categories) {
+    categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+  }
+}
+const categories = Array.from(categoryMap.entries()).sort((a, b) => b[1] - a[1]);
+
+// 获取所有标签
+const tagMap = new Map<string, number>();
+for (const post of posts) {
+  for (const tag of post.data.tags) {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  }
+}
+const tags = Array.from(tagMap.entries()).sort((a, b) => b[1] - a[1]);
+
+// 为每篇文章添加分类和标签数据用于前端筛选
+const postsWithData = posts.map((post) => ({
+  ...post,
+  data: {
+    ...post.data,
+    slug: post.slug,
+  },
+}));
+---
+
+<Layout title="文章">
+  <div class="main flex flex-col px-4 lg:flex-row">
+    <Sidebar />
+    <div
+      class="content-wrapper pt-32 lg:w-3/4 lg:p-8"
+      x-data={`{ 
+        filterType: 'category', 
+        activeCategory: '',
+        activeTags: [],
+        posts: ${JSON.stringify(postsWithData)},
+        init() {
+          const urlParams = new URLSearchParams(window.location.search);
+          const category = urlParams.get('category');
+          const tag = urlParams.get('tag');
+          if (category) {
+            this.filterType = 'category';
+            this.activeCategory = category;
+          }
+          if (tag) {
+            this.filterType = 'tag';
+            this.activeTags = [tag];
+          }
+        },
+        get filteredPosts() {
+          if (this.activeCategory) {
+            return this.posts.filter(p => p.data.categories.includes(this.activeCategory));
+          }
+          if (this.activeTags.length > 0) {
+            return this.posts.filter(p => this.activeTags.every(tag => p.data.tags.includes(tag)));
+          }
+          return this.posts;
+        }
+      }`}
+      x-init="init()"
+      :class="{ 'is-second': menuVisible }"
+    >
+      <!-- 切换按钮 -->
+      <div class="mb-4 flex flex-wrap gap-2">
+        <button
+          @click="filterType = 'category'; activeCategory = ''; activeTags = []; window.history.replaceState({}, '', '/articles')"
+          :class="filterType === 'category' ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content hover:bg-base-300'"
+          class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+        >
+          <i class="i-ri-archive-2-line inline-block"></i>
+          分类
+        </button>
+        <button
+          @click="filterType = 'tag'; activeCategory = ''; activeTags = []; window.history.replaceState({}, '', '/articles')"
+          :class="filterType === 'tag' ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content hover:bg-base-300'"
+          class="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+        >
+          <i class="i-ri-hashtag inline-block"></i>
+          标签
+        </button>
+      </div>
+
+      <!-- 分类筛选 -->
+      <div x-show="filterType === 'category'" class="mb-8 flex flex-wrap gap-2">
+        {
+          categories.map(([name]) => (
+            <button
+              @click={`activeCategory = '${name}'; activeTags = []; window.history.replaceState({}, '', '/articles?category=${encodeURIComponent(name)}')`}
+              x-data={`{ name: '${name}' }`}
+              :class="activeCategory === name ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content hover:bg-base-300'"
+              class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            >
+              {name}
+            </button>
+          ))
+        }
+      </div>
+
+      <!-- 标签筛选 -->
+      <div x-show="filterType === 'tag'" class="mb-8 flex flex-wrap gap-2">
+        {
+          tags.map(([name]) => (
+            <button
+              @click={`if (activeTags.includes('${name}')) { activeTags = activeTags.filter(t => t !== '${name}') } else { activeTags.push('${name}') } activeCategory = ''; window.history.replaceState({}, '', '/articles?tag=' + encodeURIComponent(activeTags.join(',')))`}
+              x-data={`{ name: '${name}' }`}
+              :class="activeTags.includes(name) ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content hover:bg-base-300'"
+              class="rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            >
+              {name}
+            </button>
+          ))
+        }
+      </div>
+
+      <!-- 文章列表 -->
+      <template x-for="(post, index) in filteredPosts" :key="post.data.slug">
+        <div class="post-item animated fadeIn pb-12 md:flex" :style="'animation-delay: ' + index * 0.1 + 's'">
+          <a :href="'/posts/' + post.data.slug" class="feature-image-wrapper relative mr-8 block h-56 w-full flex-shrink-0 rounded-lg bg-base-200 md:h-40 md:w-56" x-show="post.data.cover">
+            <img
+              width="224"
+              height="160"
+              class="post-feature-image size-full object-cover"
+              :alt="post.data.title"
+              :src="post.data.cover"
+              loading="lazy"
+            />
+          </a>
+          <div class="content">
+            <a :href="'/posts/' + post.data.slug">
+              <h2 class="post-title mt-5 text-xl font-extrabold md:mt-0" x-text="post.data.title"></h2>
+            </a>
+            <div class="post-abstract my-4 line-clamp-3 font-light text-base-content/80" x-text="post.data.excerpt" x-show="post.data.excerpt"></div>
+            <div class="flex gap-2.5">
+              <div class="inline-flex items-center gap-1" x-show="post.data.categories.length > 0">
+                <div class="i-ri-archive-2-line !size-3 text-base-content/50"></div>
+                <template x-for="category in post.data.categories" :key="category">
+                  <a :href="'/articles?category=' + encodeURIComponent(category)" class="text-xs font-light text-base-content/50 hover:text-base-content" x-text="category"></a>
+                </template>
+              </div>
+              <div class="inline-flex items-center gap-1" x-show="post.data.tags.length > 0">
+                <div class="i-ri-hashtag !size-3 text-base-content/50"></div>
+                <template x-for="tag in post.data.tags" :key="tag">
+                  <a :href="'/articles?tag=' + encodeURIComponent(tag)" class="text-xs font-light text-base-content/50 hover:text-base-content" x-text="tag"></a>
+                </template>
+              </div>
+              <div class="text-xs font-light text-base-content/50" x-text="post.data.date.split('T')[0]"></div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</Layout>

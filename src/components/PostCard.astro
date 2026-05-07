@@ -1,0 +1,103 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { SITE_CONFIG } from "../config";
+
+interface Props {
+  post: CollectionEntry<"posts">;
+  index: number;
+}
+
+const { post, index } = Astro.props;
+const config = SITE_CONFIG;
+const showCover = true;
+const showCategories = true;
+const showTags = true;
+const showVisit = true;
+const showDate = true;
+---
+
+<section
+  class="post-item animated fadeIn pb-12 md:flex"
+  style={`animation-delay: ${index * 0.1}s`}
+>
+  {
+    showCover && post.data.cover && (
+      <a
+        href={`/posts/${post.slug}`}
+        class="feature-image-wrapper relative mr-8 block h-56 w-full flex-shrink-0 rounded-lg bg-base-200 md:h-40 md:w-56"
+      >
+        <img
+          width="224"
+          height="160"
+          class="post-feature-image size-full object-cover"
+          alt={post.data.title}
+          src={post.data.cover}
+          loading="lazy"
+        />
+        {
+          post.data.pinned && (
+            <span class="absolute right-2 top-2 inline-flex items-center gap-x-1.5 rounded-full bg-primary/50 px-1.5 py-0.5 text-xs font-medium text-primary-content">
+              <svg class="size-1.5 fill-primary-content" viewBox="0 0 6 6" aria-hidden="true">
+                <circle cx="3" cy="3" r="3" />
+              </svg>
+              置顶
+            </span>
+          )
+        }
+      </a>
+    )
+  }
+  <div class="content">
+    <a href={`/posts/${post.slug}`}>
+      <h2 class="post-title mt-5 text-xl font-extrabold md:mt-0">{post.data.title}</h2>
+    </a>
+    {
+      post.data.excerpt && (
+        <div class="post-abstract my-4 line-clamp-3 font-light text-base-content/80">
+          {post.data.excerpt}
+        </div>
+      )
+    }
+    <div class="flex gap-2.5">
+      {
+        showCategories && post.data.categories.length > 0 && (
+          <div class="inline-flex items-center gap-1">
+            <div class="i-ri-archive-2-line !size-3 text-base-content/50"></div>
+            {post.data.categories.map((category) => (
+              <a
+                class="text-xs font-light text-base-content/50 hover:text-base-content"
+                href={`/articles?category=${encodeURIComponent(category)}`}
+                title={`分类：${category}`}
+              >
+                {category}
+              </a>
+            ))}
+          </div>
+        )
+      }
+      {
+        showTags && post.data.tags.length > 0 && (
+          <div class="inline-flex items-center gap-1">
+            <div class="i-ri-hashtag !size-3 text-base-content/50"></div>
+            {post.data.tags.map((tag) => (
+              <a
+                class="text-xs font-light text-base-content/50 hover:text-base-content"
+                href={`/articles?tag=${encodeURIComponent(tag)}`}
+                title={`标签：${tag}`}
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+      {
+        showDate && (
+          <div class="text-xs font-light text-base-content/50">
+            {post.data.date.toISOString().split("T")[0]}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>

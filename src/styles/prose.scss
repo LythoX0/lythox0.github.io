@@ -1,0 +1,7 @@
+.tailwind-typography {
+  @apply prose prose-base mt-4 max-w-none break-words prose-pre:p-0;
+
+  p > img {
+    margin: 0 !important;
+  }
+}

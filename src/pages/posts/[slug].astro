@@ -1,0 +1,104 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import Sidebar from "../../components/Sidebar.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("posts", ({ data }) => {
+    return import.meta.env.PROD ? !data.draft : true;
+  });
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<Layout
+  title={post.data.title}
+  description={post.data.excerpt}
+  ogImage={post.data.cover}
+>
+  <div id="app" class="main flex flex-col px-4 lg:flex-row">
+    <Sidebar showToc={true} />
+    <div
+      class="content-wrapper post-detail animated fadeIn pt-32 lg:w-3/4 lg:p-8"
+      :class="{ 'is-second': menuVisible }"
+      x-data="{shareModal:false,donateModal:false}"
+    >
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h1 class="break-all text-3xl font-bold">{post.data.title}</h1>
+      </div>
+
+      <div class="my-4 flex flex-wrap items-center justify-between lg:my-8">
+        <div class="flex gap-4">
+          {
+            post.data.categories.length > 0 && (
+              <div class="inline-flex items-center gap-1.5">
+                <div class="i-ri-archive-2-line text-base-content/50"></div>
+                {post.data.categories.map((category) => (
+                  <a
+                    class="text-sm font-light text-base-content/50 hover:text-base-content"
+                    href={`/categories/${category}`}
+                    title={category}
+                  >
+                    {category}
+                  </a>
+                ))}
+              </div>
+            )
+          }
+        </div>
+        <div>
+          <div class="text-sm font-light text-base-content/50">
+            {post.data.date.toISOString().split("T")[0]}
+          </div>
+        </div>
+      </div>
+
+      {
+        post.data.cover && (
+          <img
+            class="mb-8 w-full rounded-lg object-cover shadow-md"
+            src={post.data.cover}
+            alt={post.data.title}
+            loading="lazy"
+          />
+        )
+      }
+
+      <div
+        id="post-content"
+        class="tailwind-typography markdown-body overflow-hidden"
+      >
+        <Content />
+      </div>
+
+      {
+        post.data.tags.length > 0 && (
+          <div class="mt-8 flex flex-wrap gap-2">
+            <div class="i-ri-hashtag inline-block text-base-content/50"></div>
+            {post.data.tags.map((tag) => (
+              <a
+                href={`/tags/${tag}`}
+                class="rounded-full bg-base-200 px-3 py-1 text-xs text-base-content/70 hover:bg-base-300 hover:text-base-content"
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { generateToc } from "../../scripts/utils/toc";
+  // @ts-ignore
+  generateToc("post-content", ".toc-container");
+</script>

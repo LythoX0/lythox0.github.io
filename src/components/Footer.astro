@@ -1,0 +1,16 @@
+---
+import { SITE_CONFIG } from "../config";
+const config = SITE_CONFIG;
+---
+
+<footer class="mt-10 space-y-2 bg-base-100 py-8">
+  <hr class="my-6 border-base-content/5 sm:mx-auto lg:my-8" />
+  <span class="container mx-auto block text-center text-sm text-base-content/70">
+    &copy; {new Date().getFullYear()}
+    <a href="/">{config.title}</a>
+    {config.footer.copyright}
+  </span>
+  <span class="container mx-auto block text-center text-sm text-base-content/70">
+    Powered by Astro &amp; Walker Theme
+  </span>
+</footer>
